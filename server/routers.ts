@@ -4,6 +4,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
 import { z } from "zod";
 import * as db from "./db";
+import { buscarProcessosCNJ, buscarPublicacoesCNJ } from "./cnj-integration";
 
 export const appRouter = router({
   system: systemRouter,
@@ -340,6 +341,81 @@ export const appRouter = router({
         }
         await db.deleteTransacao(input.id);
         return { success: true };
+      }),
+  }),
+
+  // CNJ Integration procedures
+  cnj: router({
+    buscarProcessos: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        const advogado = await db.getAdvogadoByUserId(ctx.user.id);
+        if (!advogado) {
+          throw new Error("Advogado não encontrado");
+        }
+        if (!advogado.oab || !ctx.user.name) {
+          throw new Error("OAB e nome do advogado são obrigatórios");
+        }
+
+        try {
+          const processos = await buscarProcessosCNJ(ctx.user.name, advogado.oab);
+          
+          // Salvar processos encontrados no banco de dados
+          for (const processo of processos) {
+            await db.createProcesso({
+              numero: processo.numero,
+              cliente: processo.cliente,
+              assunto: processo.assunto,
+              status: processo.status,
+              tribunal: processo.tribunal,
+              juiz: processo.juiz,
+              descricao: processo.descricao,
+              advogadoId: advogado.id,
+            });
+          }
+
+          return {
+            sucesso: true,
+            totalProcessos: processos.length,
+            processos: processos,
+          };
+        } catch (error) {
+          console.error("Erro ao buscar processos CNJ:", error);
+          throw new Error("Erro ao buscar processos na API do CNJ");
+        }
+      }),
+
+    buscarPublicacoes: protectedProcedure
+      .input(z.object({ numeroProcesso: z.string() }))
+      .mutation(async ({ ctx, input }) => {
+        const advogado = await db.getAdvogadoByUserId(ctx.user.id);
+        if (!advogado) {
+          throw new Error("Advogado não encontrado");
+        }
+
+        try {
+          const publicacoes = await buscarPublicacoesCNJ(input.numeroProcesso);
+          
+          // Salvar publicações no banco de dados
+          for (const pub of publicacoes) {
+            await db.createPublicacao({
+              diario: pub.diario,
+              descricao: pub.descricao,
+              data: pub.data,
+              link: pub.link,
+              origem: pub.origem,
+              advogadoId: advogado.id,
+            });
+          }
+
+          return {
+            sucesso: true,
+            totalPublicacoes: publicacoes.length,
+            publicacoes: publicacoes,
+          };
+        } catch (error) {
+          console.error("Erro ao buscar publicações CNJ:", error);
+          throw new Error("Erro ao buscar publicações na API do CNJ");
+        }
       }),
   }),
 });

@@ -90,11 +90,11 @@ export default function Processos() {
             <h1 className="text-3xl font-bold">Processos Jurídicos</h1>
             <p className="text-slate-600">Gerencie todos os seus processos</p>
           </div>
-          <div className="flex gap-3">
-            <Button
-              onClick={handleBuscarCNJ}
+          <div className="flex gap-2">
+            <Button 
+              onClick={handleBuscarCNJ} 
               disabled={isLoadingCNJ}
-              className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2"
+              className="gap-2 bg-green-600 hover:bg-green-700"
             >
               {isLoadingCNJ ? (
                 <>
@@ -170,11 +170,11 @@ export default function Processos() {
           </div>
         </div>
 
-        {/* Info Card */}
+        {/* Info Box */}
         <Card className="bg-blue-50 border-blue-200">
           <CardContent className="pt-6">
             <p className="text-sm text-blue-900">
-              💡 <strong>Dica:</strong> Clique em "Atualizar do CNJ" para sincronizar automaticamente todos os processos vinculados ao seu nome e OAB na API do Diário Oficial.
+              💡 <strong>Dica:</strong> Clique em "Atualizar do CNJ" para sincronizar automaticamente todos os seus processos da API do CNJ usando seu nome e OAB cadastrados.
             </p>
           </CardContent>
         </Card>
@@ -182,8 +182,13 @@ export default function Processos() {
         {processos.length === 0 ? (
           <Card>
             <CardContent className="pt-12 text-center">
-              <p className="text-slate-500 mb-4">Nenhum processo</p>
-              <Button onClick={() => setOpen(true)}>Criar Primeiro</Button>
+              <p className="text-slate-500 mb-4">Nenhum processo cadastrado</p>
+              <div className="flex gap-2 justify-center">
+                <Button onClick={() => setOpen(true)}>Criar Primeiro</Button>
+                <Button variant="outline" onClick={handleBuscarCNJ} disabled={isLoadingCNJ}>
+                  Buscar do CNJ
+                </Button>
+              </div>
             </CardContent>
           </Card>
         ) : (
@@ -199,9 +204,26 @@ export default function Processos() {
                       </div>
                       <p className="text-sm text-slate-600">Cliente: {processo.cliente}</p>
                       <p className="text-sm text-slate-600">Assunto: {processo.assunto}</p>
+                      {processo.tribunal && <p className="text-sm text-slate-600">Tribunal: {processo.tribunal}</p>}
                     </div>
                     <div className="flex gap-2">
-                      <Button size="sm" variant="outline" onClick={() => { setFormData({ numero: processo.numero, cliente: processo.cliente, assunto: processo.assunto, status: processo.status || "Em andamento", descricao: processo.descricao || "", tribunal: processo.tribunal || "", juiz: processo.juiz || "" }); setEditingId(processo.id); setOpen(true); }}>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          setFormData({
+                            numero: processo.numero,
+                            cliente: processo.cliente,
+                            assunto: processo.assunto,
+                            status: processo.status || "Em andamento",
+                            descricao: processo.descricao || "",
+                            tribunal: processo.tribunal || "",
+                            juiz: processo.juiz || "",
+                          });
+                          setEditingId(processo.id);
+                          setOpen(true);
+                        }}
+                      >
                         <Edit2 className="w-4 h-4" />
                       </Button>
                       <Button size="sm" variant="outline" onClick={() => handleDelete(processo.id)}>
