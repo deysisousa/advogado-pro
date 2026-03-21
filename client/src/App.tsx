@@ -1,3 +1,5 @@
+import Configuracoes from "./pages/Configuracoes";
+import { Settings } from "lucide-react";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
@@ -45,6 +47,7 @@ function Router() {
           <Route path={"/publicacoes"} component={Publicacoes} />
           <Route path={"/documentos"} component={Documentos} />
           <Route path={"/financeiro"} component={Financeiro} />
+          <Route path={"/configuracoes"} component={Configuracoes} />
           <Route path={"/configuracoes"} component={Configuracoes} />
           <Route path={"/404"} component={NotFound} />
           <Route component={NotFound} />
