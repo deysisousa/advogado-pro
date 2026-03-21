@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, decimal, date, boolean } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -25,4 +25,109 @@ export const users = mysqlTable("users", {
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 
-// TODO: Add your tables here
+// Tabela de Advogados
+export const advogados = mysqlTable("advogados", {
+  id: int("id").autoincrement().primaryKey(),
+  usuarioId: int("usuarioId").notNull().unique(),
+  oab: varchar("oab", { length: 20 }).notNull().unique(),
+  especialidades: text("especialidades"),
+  telefone: varchar("telefone", { length: 20 }),
+  endereco: text("endereco"),
+  cidade: varchar("cidade", { length: 100 }),
+  estado: varchar("estado", { length: 2 }),
+  fotoPerfil: text("fotoPerfil"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Advogado = typeof advogados.$inferSelect;
+export type InsertAdvogado = typeof advogados.$inferInsert;
+
+// Tabela de Processos Jurídicos
+export const processos = mysqlTable("processos", {
+  id: int("id").autoincrement().primaryKey(),
+  numero: varchar("numero", { length: 30 }).notNull(),
+  cliente: varchar("cliente", { length: 255 }).notNull(),
+  assunto: varchar("assunto", { length: 255 }).notNull(),
+  status: varchar("status", { length: 50 }).default("Em andamento"),
+  descricao: text("descricao"),
+  tribunal: varchar("tribunal", { length: 255 }),
+  juiz: varchar("juiz", { length: 255 }),
+  dataCadastro: timestamp("dataCadastro").defaultNow().notNull(),
+  advogadoId: int("advogadoId").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Processo = typeof processos.$inferSelect;
+export type InsertProcesso = typeof processos.$inferInsert;
+
+// Tabela de Prazos
+export const prazos = mysqlTable("prazos", {
+  id: int("id").autoincrement().primaryKey(),
+  descricao: varchar("descricao", { length: 255 }).notNull(),
+  data: date("data").notNull(),
+  prioridade: varchar("prioridade", { length: 20 }).default("média"),
+  tipo: varchar("tipo", { length: 100 }),
+  processoId: int("processoId").notNull(),
+  advogadoId: int("advogadoId").notNull(),
+  concluido: boolean("concluido").default(false),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Prazo = typeof prazos.$inferSelect;
+export type InsertPrazo = typeof prazos.$inferInsert;
+
+// Tabela de Publicações (do CNJ)
+export const publicacoes = mysqlTable("publicacoes", {
+  id: int("id").autoincrement().primaryKey(),
+  data: date("data").notNull(),
+  diario: varchar("diario", { length: 255 }),
+  descricao: text("descricao"),
+  link: text("link"),
+  processoId: int("processoId"),
+  advogadoId: int("advogadoId").notNull(),
+  origem: varchar("origem", { length: 50 }).default("cnj"),
+  idExterno: varchar("idExterno", { length: 255 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Publicacao = typeof publicacoes.$inferSelect;
+export type InsertPublicacao = typeof publicacoes.$inferInsert;
+
+// Tabela de Documentos
+export const documentos = mysqlTable("documentos", {
+  id: int("id").autoincrement().primaryKey(),
+  nome: varchar("nome", { length: 255 }).notNull(),
+  tipo: varchar("tipo", { length: 100 }),
+  data: date("data"),
+  link: text("link"),
+  tamanho: varchar("tamanho", { length: 50 }),
+  processoId: int("processoId").notNull(),
+  advogadoId: int("advogadoId").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Documento = typeof documentos.$inferSelect;
+export type InsertDocumento = typeof documentos.$inferInsert;
+
+// Tabela de Transações Financeiras
+export const transacoes = mysqlTable("transacoes", {
+  id: int("id").autoincrement().primaryKey(),
+  descricao: varchar("descricao", { length: 255 }).notNull(),
+  valor: decimal("valor", { precision: 10, scale: 2 }).notNull(),
+  tipo: varchar("tipo", { length: 20 }).notNull(),
+  data: date("data").notNull(),
+  categoria: varchar("categoria", { length: 100 }),
+  metodo: varchar("metodo", { length: 100 }),
+  processoId: int("processoId"),
+  advogadoId: int("advogadoId").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Transacao = typeof transacoes.$inferSelect;
+export type InsertTransacao = typeof transacoes.$inferInsert;

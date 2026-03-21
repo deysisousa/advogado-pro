@@ -1,11 +1,10 @@
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { InsertUser, users, advogados, processos, prazos, publicacoes, documentos, transacoes } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
-// Lazily create the drizzle instance so local tooling can run without a DB.
 export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
     try {
@@ -89,4 +88,129 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+// Advogado queries
+export async function getAdvogadoByUserId(usuarioId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(advogados).where(eq(advogados.usuarioId, usuarioId)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function createAdvogado(data: typeof advogados.$inferInsert) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(advogados).values(data);
+  return result;
+}
+
+export async function updateAdvogado(id: number, data: Partial<typeof advogados.$inferInsert>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(advogados).set(data).where(eq(advogados.id, id));
+}
+
+// Processo queries
+export async function getProcessosByAdvogado(advogadoId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(processos).where(eq(processos.advogadoId, advogadoId));
+}
+
+export async function createProcesso(data: typeof processos.$inferInsert) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(processos).values(data);
+  return result;
+}
+
+export async function updateProcesso(id: number, data: Partial<typeof processos.$inferInsert>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(processos).set(data).where(eq(processos.id, id));
+}
+
+export async function deleteProcesso(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(processos).where(eq(processos.id, id));
+}
+
+// Prazo queries
+export async function getPrazosByAdvogado(advogadoId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(prazos).where(eq(prazos.advogadoId, advogadoId));
+}
+
+export async function createPrazo(data: typeof prazos.$inferInsert) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(prazos).values(data);
+  return result;
+}
+
+export async function updatePrazo(id: number, data: Partial<typeof prazos.$inferInsert>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(prazos).set(data).where(eq(prazos.id, id));
+}
+
+// Publicacao queries
+export async function getPublicacoesByAdvogado(advogadoId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(publicacoes).where(eq(publicacoes.advogadoId, advogadoId));
+}
+
+export async function createPublicacao(data: typeof publicacoes.$inferInsert) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(publicacoes).values(data);
+  return result;
+}
+
+// Documento queries
+export async function getDocumentosByAdvogado(advogadoId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(documentos).where(eq(documentos.advogadoId, advogadoId));
+}
+
+export async function createDocumento(data: typeof documentos.$inferInsert) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(documentos).values(data);
+  return result;
+}
+
+export async function deleteDocumento(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(documentos).where(eq(documentos.id, id));
+}
+
+// Transacao queries
+export async function getTransacoesByAdvogado(advogadoId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(transacoes).where(eq(transacoes.advogadoId, advogadoId));
+}
+
+export async function createTransacao(data: typeof transacoes.$inferInsert) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(transacoes).values(data);
+  return result;
+}
+
+export async function updateTransacao(id: number, data: Partial<typeof transacoes.$inferInsert>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(transacoes).set(data).where(eq(transacoes.id, id));
+}
+
+export async function deleteTransacao(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(transacoes).where(eq(transacoes.id, id));
+}
