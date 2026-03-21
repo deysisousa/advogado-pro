@@ -30,6 +30,10 @@ import { Button } from "./ui/button";
 const menuItems = [
   { icon: LayoutDashboard, label: "Page 1", path: "/" },
   { icon: Users, label: "Page 2", path: "/some-path" },
+  <Link href="/configuracoes" className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100">
+  <Settings className="w-4 h-4" />
+  Configurações
+</Link>
 ];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";
