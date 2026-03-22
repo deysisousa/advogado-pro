@@ -32,19 +32,14 @@ interface ProcessoFormatado {
 
 /**
  * Busca processos na API do CNJ usando nome do advogado e OAB
- * @param nomeAdvogado - Nome completo do advogado
- * @param oab - Número da OAB do advogado
- * @returns Array de processos encontrados
  */
 export async function buscarProcessosCNJ(
   nomeAdvogado: string,
   oab: string
 ): Promise<ProcessoFormatado[]> {
   try {
-    // Formatar a busca: procura pelo nome do advogado e OAB
     const query = `${nomeAdvogado} ${oab}`;
 
-    // Fazer requisição à API do CNJ
     const response = await axios.get(CNJ_API_URL, {
       headers: {
         Authorization: `APIKey ${CNJ_API_KEY}`,
@@ -52,19 +47,17 @@ export async function buscarProcessosCNJ(
       },
       params: {
         q: query,
-        size: 100, // Buscar até 100 resultados
+        size: 100,
       },
-      timeout: 30000, // 30 segundos de timeout
+      timeout: 30000,
     });
 
-    // Processar resposta
     const processos: ProcessoFormatado[] = [];
 
     if (response.data && response.data.hits && response.data.hits.hits) {
       for (const hit of response.data.hits.hits) {
         const processo = hit._source as CNJProcesso;
 
-        // Verificar se o advogado está envolvido no processo
         if (
           processo.partes &&
           processo.partes.some(
@@ -97,8 +90,6 @@ export async function buscarProcessosCNJ(
 
 /**
  * Busca publicações na API do CNJ usando número do processo
- * @param numeroProcesso - Número do processo
- * @returns Array de publicações encontradas
  */
 export async function buscarPublicacoesCNJ(
   numeroProcesso: string
@@ -159,10 +150,6 @@ export async function buscarPublicacoesCNJ(
 
 /**
  * Sincroniza processos do CNJ com o banco de dados
- * @param nomeAdvogado - Nome do advogado
- * @param oab - OAB do advogado
- * @param advogadoId - ID do advogado no banco
- * @returns Número de processos sincronizados
  */
 export async function sincronizarProcessosCNJ(
   nomeAdvogado: string,

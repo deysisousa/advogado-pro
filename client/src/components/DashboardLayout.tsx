@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users, FileText, Clock, Newspaper, FileUp, DollarSign, Settings } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, Settings, FileText, Clock, FileCheck, Folder, DollarSign } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
@@ -31,8 +31,8 @@ const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/" },
   { icon: FileText, label: "Processos", path: "/processos" },
   { icon: Clock, label: "Prazos", path: "/prazos" },
-  { icon: Newspaper, label: "Publicações", path: "/publicacoes" },
-  { icon: FileUp, label: "Documentos", path: "/documentos" },
+  { icon: FileCheck, label: "Publicações", path: "/publicacoes" },
+  { icon: Folder, label: "Documentos", path: "/documentos" },
   { icon: DollarSign, label: "Financeiro", path: "/financeiro" },
   { icon: Settings, label: "Configurações", path: "/configuracoes" },
 ];
