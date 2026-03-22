@@ -421,3 +421,4 @@ export const appRouter = router({
 });
 
 export type AppRouter = typeof appRouter;
+Sistema para Advogados com GitHub e API do CNJ - Manus
